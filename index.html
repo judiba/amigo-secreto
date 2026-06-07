@@ -1,41 +1,161 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
-    <title>Amigo Secreto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <title>Amigo Secreto ⚡ Cyberpunk</title>
 </head>
-
 <body>
-    <main class="main-content">
-        <header class="header-banner">
-            <h1 class="main-title">Amigo Secreto</h1>
-            <img src="assets/amigo-secreto.png" alt="Imagem representativa de amigo secreto">
-        </header>
-        
-        <section class="input-section">
-            <h2 class="section-title">Digite o nome dos seus amigos</h2>
-            <div class="input-wrapper">
-                <input type="text" id="amigo" class="input-name" placeholder="Digite um nome">
-                <button class="button-add" onclick="adicionarAmigo()">Adicionar</button>
-            </div>
-           
-            <ul id="listaAmigos" class="name-list" aria-labelledby="listaAmigos" role="list"></ul>
-            <ul id="resultado" class="result-list" aria-live="polite"></ul>
+  <!-- Partículas de fundo -->
+  <div class="particles" id="particles"></div>
+  <!-- Grade neon de fundo -->
+  <div class="neon-grid"></div>
 
-            <div class="button-container">
-                <button class="button-draw" onclick="sortearAmigo()" aria-label="Sortear amigo secreto">
-                    <img src="assets/play_circle_outline.png" alt="Ícone para sortear">
-                    Sortear amigo
-                </button>
-            </div>
-        </section>
-    </main>
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header-banner">
+      <div class="header-inner">
+        <div class="logo-area">
+          <img src="assets/amigo-secreto.svg" alt="Amigo Secreto" class="logo-img" />
+          <div class="title-area">
+            <h1 class="main-title">AMIGO<span class="neon-accent">SECRETO</span></h1>
+            <p class="main-subtitle">// PROTOCOLO CYBERPUNK //</p>
+          </div>
+        </div>
+        <div class="scanline"></div>
+      </div>
+    </header>
 
-    <script src="app.js" defer></script>
+    <!-- Seção de cadastro -->
+    <section class="input-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="bracket">[</span> CADASTRO DE PARTICIPANTES <span class="bracket">]</span>
+        </h2>
+        <p class="section-sub">Preencha os dados de cada participante</p>
+      </div>
+
+      <!-- Formulário -->
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="inputNome" class="form-label">
+              <span class="label-icon">▸</span> NOME
+            </label>
+            <input
+              type="text"
+              id="inputNome"
+              class="cyber-input"
+              placeholder="Primeiro nome"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="inputSobrenome" class="form-label">
+              <span class="label-icon">▸</span> SOBRENOME
+            </label>
+            <input
+              type="text"
+              id="inputSobrenome"
+              class="cyber-input"
+              placeholder="Sobrenome"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="inputEmail" class="form-label">
+              <span class="label-icon">▸</span> E-MAIL
+            </label>
+            <input
+              type="email"
+              id="inputEmail"
+              class="cyber-input"
+              placeholder="usuario@email.com"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="inputWhatsapp" class="form-label">
+              <span class="label-icon">▸</span> WHATSAPP
+            </label>
+            <input
+              type="tel"
+              id="inputWhatsapp"
+              class="cyber-input"
+              placeholder="+55 (11) 99999-9999"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- Seleção de canal de notificação -->
+        <div class="channel-select">
+          <p class="form-label"><span class="label-icon">▸</span> CANAL DE NOTIFICAÇÃO</p>
+          <div class="channel-options">
+            <label class="channel-option" for="canalEmail">
+              <input type="radio" id="canalEmail" name="canal" value="email" checked />
+              <span class="channel-btn">
+                <span class="channel-icon">✉</span>
+                E-MAIL
+              </span>
+            </label>
+            <label class="channel-option" for="canalWhatsapp">
+              <input type="radio" id="canalWhatsapp" name="canal" value="whatsapp" />
+              <span class="channel-btn">
+                <span class="channel-icon">💬</span>
+                WHATSAPP
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="cyber-btn btn-add" id="btnAdicionar" type="button">
+            <span class="btn-glitch" data-text="+ ADICIONAR">+ ADICIONAR</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensagem de status -->
+      <div id="mensagemStatus" class="status-message" aria-live="polite"></div>
+
+      <!-- Lista de participantes -->
+      <div class="participants-panel" id="participantsPanel">
+        <div class="panel-header">
+          <h3 class="panel-title">
+            <span class="bracket">[</span> PARTICIPANTES <span class="bracket">]</span>
+            <span class="count-badge" id="countBadge">0</span>
+          </h3>
+          <div class="min-indicator" id="minIndicator">
+            <span class="indicator-dot" id="indicatorDot"></span>
+            <span id="minText">Mínimo 4 participantes necessários</span>
+          </div>
+        </div>
+
+        <ul id="listaParticipantes" class="participants-list" role="list" aria-label="Lista de participantes"></ul>
+      </div>
+
+      <!-- Botão de ir para sorteio -->
+      <div class="draw-action" id="drawAction">
+        <a href="sorteio.html" class="cyber-btn btn-draw" id="btnSortear" aria-label="Ir para o sorteio">
+          <img src="assets/play_circle_outline.png" alt="" class="btn-icon" />
+          <span class="btn-glitch" data-text="⚡ INICIAR SORTEIO">⚡ INICIAR SORTEIO</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="cyber-footer">
+    <p>// AMIGO SECRETO CYBERPUNK // <span class="neon-accent">2025</span> //</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>

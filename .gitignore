@@ -1,0 +1,26 @@
+# Editor
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependências (caso venha a usar algum bundler futuramente)
+node_modules/
+dist/
+.cache/
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*

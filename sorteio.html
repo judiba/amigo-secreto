@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <title>Sorteio ⚡ Amigo Secreto Cyberpunk</title>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  <div class="neon-grid"></div>
+
+  <main class="main-content sorteio-page">
+    <!-- Header -->
+    <header class="header-banner header-small">
+      <div class="header-inner">
+        <div class="logo-area">
+          <img src="assets/amigo-secreto.svg" alt="Amigo Secreto" class="logo-img logo-small" />
+          <div class="title-area">
+            <h1 class="main-title">AMIGO<span class="neon-accent">SECRETO</span></h1>
+            <p class="main-subtitle">// PROTOCOLO CYBERPUNK //</p>
+          </div>
+        </div>
+        <a href="index.html" class="back-btn">← VOLTAR</a>
+      </div>
+    </header>
+
+    <section class="input-section sorteio-section">
+
+      <!-- Painel pré-sorteio -->
+      <div id="panelPreSorteio" class="draw-panel">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="bracket">[</span> CENTRAL DE SORTEIO <span class="bracket">]</span>
+          </h2>
+        </div>
+
+        <!-- Resumo de participantes -->
+        <div class="summary-card">
+          <div class="summary-header">
+            <span class="summary-icon">⚡</span>
+            <span id="summaryCount">0 participantes prontos</span>
+          </div>
+          <ul id="summaryList" class="summary-list"></ul>
+        </div>
+
+        <!-- Aviso sem participantes -->
+        <div id="noParticipants" class="alert-card alert-error" style="display:none;">
+          <p>⚠ Nenhum participante cadastrado.</p>
+          <a href="index.html" class="cyber-btn btn-add" style="margin-top:16px; display:inline-flex;">
+            ← CADASTRAR PARTICIPANTES
+          </a>
+        </div>
+
+        <!-- Botão sortear -->
+        <div class="draw-action" id="btnDrawAction">
+          <button class="cyber-btn btn-draw" id="btnExecutarSorteio" type="button">
+            <img src="assets/play_circle_outline.png" alt="" class="btn-icon" />
+            <span class="btn-glitch" data-text="⚡ EXECUTAR SORTEIO">⚡ EXECUTAR SORTEIO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Painel pós-sorteio -->
+      <div id="panelResultado" class="draw-panel" style="display:none;">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="bracket">[</span> RESULTADO DO SORTEIO <span class="bracket">]</span>
+          </h2>
+          <p class="section-sub">Clique em "ENVIAR" para cada participante receber seu amigo secreto</p>
+        </div>
+
+        <!-- Lista de resultados -->
+        <ul id="listaResultado" class="result-cards" role="list" aria-label="Resultados do sorteio"></ul>
+
+        <!-- Botão enviar todos -->
+        <div class="draw-action">
+          <button class="cyber-btn btn-send-all" id="btnEnviarTodos" type="button">
+            <span class="btn-glitch" data-text="📡 ENVIAR PARA TODOS">📡 ENVIAR PARA TODOS</span>
+          </button>
+        </div>
+
+        <!-- Botão novo sorteio -->
+        <div class="draw-action" style="margin-top:12px;">
+          <button class="cyber-btn btn-reset" id="btnNovoSorteio" type="button">
+            <span class="btn-glitch" data-text="↺ NOVO SORTEIO">↺ NOVO SORTEIO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast de notificação -->
+      <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+
+    </section>
+  </main>
+
+  <footer class="cyber-footer">
+    <p>// AMIGO SECRETO CYBERPUNK // <span class="neon-accent">2025</span> //</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
