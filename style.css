@@ -810,6 +810,29 @@ body {
   cursor: default;
 }
 
+.result-secret {
+  color: var(--text-dim);
+  font-style: normal;
+}
+.result-secret em {
+  color: var(--magenta);
+  font-style: normal;
+  letter-spacing: 1px;
+}
+.badge-enviado {
+  display: inline-block;
+  font-family: var(--font-main);
+  font-size: 10px;
+  color: var(--success);
+  background: rgba(0,255,135,0.1);
+  border: 1px solid rgba(0,255,135,0.3);
+  border-radius: 12px;
+  padding: 2px 10px;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
 /* ---- Toast ---- */
 .toast {
   position: fixed;

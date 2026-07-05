@@ -162,6 +162,29 @@ function initCadastro() {
   // Máscara de WhatsApp
   inputWhatsapp.addEventListener('input', () => mascararWhatsapp(inputWhatsapp));
 
+  // Mostrar/ocultar campos de acordo com o canal selecionado
+  function atualizarCamposCanal() {
+    const canal = document.querySelector('input[name="canal"]:checked')?.value || 'email';
+    const groupEmail    = document.getElementById('groupEmail');
+    const groupWhatsapp = document.getElementById('groupWhatsapp');
+
+    if (canal === 'email') {
+      groupEmail.style.display    = '';
+      groupWhatsapp.style.display = 'none';
+      inputWhatsapp.value = '';
+    } else {
+      groupEmail.style.display    = 'none';
+      groupWhatsapp.style.display = '';
+      inputEmail.value = '';
+    }
+  }
+
+  // Ouvir mudança de canal
+  document.querySelectorAll('input[name="canal"]').forEach(r => {
+    r.addEventListener('change', atualizarCamposCanal);
+  });
+  atualizarCamposCanal(); // estado inicial
+
   // Permitir Enter para adicionar
   [inputNome, inputSobrenome, inputEmail, inputWhatsapp].forEach(el => {
     el.addEventListener('keydown', e => {
@@ -192,7 +215,7 @@ function initCadastro() {
     const whatsapp  = inputWhatsapp.value.trim();
     const canal     = document.querySelector('input[name="canal"]:checked')?.value || 'email';
 
-    // Validações
+    // Validações obrigatórias
     if (!nome) {
       mostrarStatus('⚠ Preencha o nome do participante.', 'error');
       inputNome.focus();
@@ -203,30 +226,41 @@ function initCadastro() {
       inputSobrenome.focus();
       return;
     }
-    if (!validarEmail(email)) {
-      mostrarStatus('⚠ Informe um e-mail válido.', 'error');
-      inputEmail.focus();
-      return;
-    }
-    if (!validarWhatsapp(whatsapp)) {
-      mostrarStatus('⚠ Informe um número de WhatsApp válido (mín. 10 dígitos).', 'error');
-      inputWhatsapp.focus();
-      return;
-    }
 
-    // Duplicata por e-mail
-    if (participantes.some(p => p.email.toLowerCase() === email.toLowerCase())) {
-      mostrarStatus('⚠ Este e-mail já foi cadastrado.', 'error');
-      inputEmail.focus();
-      return;
+    // Validação condicional por canal escolhido
+    if (canal === 'email') {
+      if (!validarEmail(email)) {
+        mostrarStatus('⚠ Informe um e-mail válido para o canal selecionado.', 'error');
+        inputEmail.focus();
+        return;
+      }
+      // Duplicata por e-mail
+      if (participantes.some(p => p.email && p.email.toLowerCase() === email.toLowerCase())) {
+        mostrarStatus('⚠ Este e-mail já foi cadastrado.', 'error');
+        inputEmail.focus();
+        return;
+      }
+    } else {
+      if (!validarWhatsapp(whatsapp)) {
+        mostrarStatus('⚠ Informe um número de WhatsApp válido (mín. 10 dígitos).', 'error');
+        inputWhatsapp.focus();
+        return;
+      }
+      // Duplicata por WhatsApp
+      const wpNorm = normalizarWhatsapp(whatsapp);
+      if (participantes.some(p => p.whatsapp && normalizarWhatsapp(p.whatsapp) === wpNorm)) {
+        mostrarStatus('⚠ Este WhatsApp já foi cadastrado.', 'error');
+        inputWhatsapp.focus();
+        return;
+      }
     }
 
     const nomeCompleto = `${nome} ${sobrenome}`;
 
     participantes.push({
       nome: nomeCompleto,
-      email: email.toLowerCase(),
-      whatsapp: normalizarWhatsapp(whatsapp),
+      email: canal === 'email' ? email.toLowerCase() : '',
+      whatsapp: canal === 'whatsapp' ? normalizarWhatsapp(whatsapp) : '',
       canal
     });
 
@@ -242,9 +276,10 @@ function initCadastro() {
     inputSobrenome.value = '';
     inputEmail.value     = '';
     inputWhatsapp.value  = '';
-    // Resetar canal para e-mail
+    // Resetar canal para e-mail e atualizar visibilidade dos campos
     const radioEmail = document.getElementById('canalEmail');
     if (radioEmail) radioEmail.checked = true;
+    atualizarCamposCanal();
   }
 
   function removerParticipante(index) {
@@ -284,7 +319,7 @@ function initCadastro() {
 
       const contato = p.canal === 'whatsapp'
         ? formatarWhatsapp(p.whatsapp)
-        : p.email;
+        : (p.email || '—');
 
       li.innerHTML = `
         <div class="participant-info">
@@ -318,6 +353,7 @@ function initSorteio() {
   const btnNovoSorteio = document.getElementById('btnNovoSorteio');
   const noParticipants = document.getElementById('noParticipants');
   const btnDrawAction  = document.getElementById('btnDrawAction');
+  const dispatchPanel  = document.getElementById('dispatchPanel');
 
   if (!btnExecutar) return; // não está na página certa
 
@@ -328,7 +364,6 @@ function initSorteio() {
   summaryCount.textContent = `${participantes.length} participante${participantes.length !== 1 ? 's' : ''} cadastrado${participantes.length !== 1 ? 's' : ''}`;
 
   if (participantes.length < 4) {
-    // Sem participantes suficientes
     noParticipants.style.display = 'flex';
     if (btnDrawAction) btnDrawAction.style.display = 'none';
     noParticipants.querySelector('p').textContent =
@@ -336,17 +371,20 @@ function initSorteio() {
         ? '⚠ Nenhum participante cadastrado.'
         : `⚠ Mínimo 4 participantes necessários. Cadastrados: ${participantes.length}`;
   } else {
-    // Preenche resumo
+    // Preenche resumo (apenas nomes, sem revelar pares)
     participantes.forEach(p => {
       const li = document.createElement('li');
       li.className = 'summary-item';
-      li.innerHTML = `<span>${p.nome}</span> — ${p.canal === 'whatsapp' ? '💬 ' + formatarWhatsapp(p.whatsapp) : '✉ ' + p.email}`;
+      const canal = p.canal === 'whatsapp'
+        ? `💬 ${formatarWhatsapp(p.whatsapp)}`
+        : `✉ ${p.email}`;
+      li.innerHTML = `<span>${p.nome}</span> — ${canal}`;
       summaryList.appendChild(li);
     });
 
-    // Se já há resultado salvo, mostrar direto
+    // Se já há resultado salvo, mostrar painel de disparo
     if (resultado) {
-      exibirResultado(resultado);
+      exibirPainelDisparo(resultado);
     }
   }
 
@@ -358,7 +396,6 @@ function initSorteio() {
       return;
     }
 
-    // Animação no botão
     btnExecutar.disabled = true;
     btnExecutar.querySelector('.btn-glitch').textContent = '⟳ SORTEANDO...';
 
@@ -373,50 +410,66 @@ function initSorteio() {
       }
 
       salvarResultado(resultado);
-      exibirResultado(resultado);
+      exibirPainelDisparo(resultado);
     }, 800);
   }
 
-  function exibirResultado(res) {
+  // Exibe somente o painel de disparo anônimo — sem revelar os pares
+  function exibirPainelDisparo(res) {
     panelPre.style.display = 'none';
     panelResultado.style.display = 'block';
-    listaResultado.innerHTML = '';
 
+    // Monta lista anônima (apenas mostra o participante, sem revelar quem tirou quem)
+    listaResultado.innerHTML = '';
     res.forEach((par, index) => {
       const li = document.createElement('li');
       li.className = `result-card${par.enviado ? ' sent' : ''}`;
       li.setAttribute('role', 'listitem');
+      li.dataset.index = index;
 
       const canalBadge = par.dador.canal === 'whatsapp'
         ? `<span class="result-channel-badge channel-whatsapp">💬 WPP</span>`
         : `<span class="result-channel-badge channel-email">✉ EMAIL</span>`;
 
-      const btnTexto = par.enviado ? '✓ ENVIADO' : '📤 ENVIAR';
-      const btnClass = par.enviado ? 'btn-enviar enviado' : 'btn-enviar';
+      const statusEnviado = par.enviado
+        ? `<span class="badge-enviado">✓ NOTIFICADO</span>`
+        : '';
 
       li.innerHTML = `
         <div class="result-card-info">
           <span class="result-giver">${par.dador.nome}</span>
-          <span class="result-arrow">▸ recebe como amigo secreto:</span>
-          <span class="result-receiver">⚡ ${par.sorteado.nome}</span>
+          <span class="result-arrow result-secret">🔒 amigo secreto: <em>oculto</em></span>
+          ${statusEnviado}
         </div>
         ${canalBadge}
-        <button class="${btnClass}" type="button" data-index="${index}" ${par.enviado ? 'disabled' : ''}>
-          ${btnTexto}
-        </button>
       `;
-
-      const btn = li.querySelector('button');
-      if (!par.enviado) {
-        btn.addEventListener('click', () => enviarNotificacao(index, li, btn));
-      }
 
       listaResultado.appendChild(li);
     });
+
+    atualizarBotaoEnviarTodos(res);
   }
 
-  function enviarNotificacao(index, li, btn) {
+  // Atualiza o estado do botão "Enviar para Todos"
+  function atualizarBotaoEnviarTodos(res) {
+    const todosEnviados = res.every(p => p.enviado);
+    if (btnEnviarTodos) {
+      if (todosEnviados) {
+        btnEnviarTodos.disabled = true;
+        btnEnviarTodos.querySelector('.btn-glitch').textContent = '✓ TODOS NOTIFICADOS';
+      } else {
+        btnEnviarTodos.disabled = false;
+        const pendentes = res.filter(p => !p.enviado).length;
+        btnEnviarTodos.querySelector('.btn-glitch').textContent = `📡 DISPARAR PARA TODOS (${pendentes})`;
+      }
+    }
+  }
+
+  // Envia notificação para um único participante (pelo índice)
+  function enviarNotificacao(index) {
     const par = resultado[index];
+    if (!par || par.enviado) return;
+
     const { dador, sorteado } = par;
 
     const mensagem = encodeURIComponent(
@@ -427,58 +480,55 @@ function initSorteio() {
       `// AMIGO SECRETO CYBERPUNK //`
     );
 
-    let linkEnvio = '';
-    let abrirLink = false;
-
     if (dador.canal === 'whatsapp') {
-      // WhatsApp Web/App
       const numero = dador.whatsapp.startsWith('55') ? dador.whatsapp : '55' + dador.whatsapp;
-      linkEnvio = `https://wa.me/${numero}?text=${mensagem}`;
-      abrirLink = true;
+      window.open(`https://wa.me/${numero}?text=${mensagem}`, '_blank');
     } else {
-      // Mailto
       const assunto = encodeURIComponent('🎁 Seu Amigo Secreto!');
-      linkEnvio = `mailto:${dador.email}?subject=${assunto}&body=${mensagem}`;
-      abrirLink = true;
-    }
-
-    if (abrirLink) {
-      window.open(linkEnvio, '_blank');
+      window.open(`mailto:${dador.email}?subject=${assunto}&body=${mensagem}`, '_blank');
     }
 
     // Marcar como enviado
     resultado[index].enviado = true;
     salvarResultado(resultado);
 
-    li.classList.add('sent');
-    btn.textContent = '✓ ENVIADO';
-    btn.className = 'btn-enviar enviado';
-    btn.disabled = true;
+    // Atualizar visual do card
+    const li = listaResultado.querySelector(`[data-index="${index}"]`);
+    if (li) {
+      li.classList.add('sent');
+      const info = li.querySelector('.result-card-info');
+      if (info && !info.querySelector('.badge-enviado')) {
+        const badge = document.createElement('span');
+        badge.className = 'badge-enviado';
+        badge.textContent = '✓ NOTIFICADO';
+        info.appendChild(badge);
+      }
+    }
 
+    atualizarBotaoEnviarTodos(resultado);
     mostrarToast(`✓ Notificação enviada para ${dador.nome}`, 'success');
   }
 
-  btnEnviarTodos.addEventListener('click', () => {
-    if (!resultado) return;
+  // Botão "Enviar para Todos" — disparo sequencial anônimo
+  if (btnEnviarTodos) {
+    btnEnviarTodos.addEventListener('click', () => {
+      if (!resultado) return;
 
-    let enviados = 0;
-    resultado.forEach((par, index) => {
-      if (!par.enviado) {
-        const li    = listaResultado.children[index];
-        const btn   = li ? li.querySelector('button') : null;
-        if (li && btn) {
-          enviarNotificacao(index, li, btn);
-          enviados++;
-        }
+      const pendentes = resultado.map((par, i) => ({ par, i })).filter(({ par }) => !par.enviado);
+
+      if (pendentes.length === 0) {
+        mostrarToast('Todos já foram notificados!', 'success');
+        return;
       }
-    });
 
-    if (enviados === 0) {
-      mostrarToast('Todos já foram notificados!', 'success');
-    } else {
-      mostrarToast(`Enviando para ${enviados} participante${enviados > 1 ? 's' : ''}...`, 'success');
-    }
-  });
+      // Dispara com pequeno intervalo para não bloquear pop-ups
+      pendentes.forEach(({ i }, idx) => {
+        setTimeout(() => enviarNotificacao(i), idx * 600);
+      });
+
+      mostrarToast(`📡 Disparando para ${pendentes.length} participante${pendentes.length > 1 ? 's' : ''}...`, 'success');
+    });
+  }
 
   btnNovoSorteio.addEventListener('click', () => {
     if (confirm('Deseja fazer um novo sorteio? O resultado atual será apagado.')) {
